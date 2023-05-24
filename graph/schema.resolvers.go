@@ -11,22 +11,81 @@ import (
 	"github.com/talksik/graphql-golang/graph/model"
 )
 
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//     it when you're done.
+//   - You have helper methods in this file. Move them out to keep these resolver files clean.
+var todos = []*model.Todo{
+	{
+		ID:   "1",
+		Text: "laundry",
+		Done: false,
+		User: &model.User{
+			ID:   "1",
+			Name: "Talksik",
+		},
+	},
+	{
+		ID:   "2",
+		Text: "woah",
+		Done: false,
+		User: &model.User{
+			ID:   "1",
+			Name: "Talksik",
+		},
+	},
+	{
+		ID:   "3",
+		Text: "Hello",
+		Done: false,
+		User: &model.User{
+			ID:   "1",
+			Name: "Talksik",
+		},
+	},
+}
+
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
 	newTodo := &model.Todo{
 		ID:   fmt.Sprintf("T%d", len(r.Todos)+1),
 		Text: input.Text,
 		Done: false,
+		User: &model.User{
+			ID:   input.Text,
+			Name: "Talksik",
+		},
 	}
 
-	r.Resolver.Todos = append(r.Resolver.Todos, newTodo)
+	todos = append(todos, newTodo)
 
 	return newTodo, nil
 }
 
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	return r.Resolver.Todos, nil
+	return todos, nil
+}
+
+// User is the resolver for the user field.
+func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
+  // get the user
+  user := &model.User{
+    ID:   "1",
+    Name: "Talksik",
+    Todos: []*model.Todo{},
+  }
+
+  // get the todos for the user
+  for _, todo := range todos {
+    if todo.User.ID == user.ID {
+      user.Todos = append(user.Todos, todo)
+    }
+  }
+
+  return user, nil
 }
 
 // Mutation returns MutationResolver implementation.
