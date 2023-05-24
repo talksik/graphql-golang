@@ -8,7 +8,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/talksik/graphql-golang/graph/model"
+	gqperror "github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 var todos = []*model.Todo{
@@ -60,6 +62,8 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
+  graphql.AddError(ctx, gqperror.Errorf("user not found"))
+
 	return todos, nil
 }
 
